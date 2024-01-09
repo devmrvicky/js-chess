@@ -1,17 +1,28 @@
-const chessBoardContainer = document.querySelector("#chess-board-container");
+import pieces from "./peices";
+
 const chessBoardElem = document.querySelector("#chess-board");
 
 const row = ["A", "B", "C", "D", "E", "F", "G", "H"];
 const col = [1, 2, 3, 4, 5, 6, 7, 8];
-let noOfStipes = 8;
 let filledBlocks = false;
 
-const fillBlock = (blockNo, blockElem) => {
-  if (blockNo === 9 || blockNo === 25 || blockNo === 41 || blockNo === 57)
+const fillCell = (cellName, cellElem) => {
+  if (
+    cellName === "A2" ||
+    cellName === "A4" ||
+    cellName === "A6" ||
+    cellName === "A8"
+  )
     filledBlocks = true;
-  if (blockNo === 17 || blockNo === 33 || blockNo === 49) filledBlocks = false;
+  if (
+    cellName === "A1" ||
+    cellName === "A3" ||
+    cellName === "A5" ||
+    cellName === "A7"
+  )
+    filledBlocks = false;
   if (filledBlocks) {
-    blockElem.classList.add("filledBlock");
+    cellElem.classList.add("filledBlock");
     filledBlocks = false;
   } else {
     filledBlocks = true;
@@ -26,70 +37,79 @@ const getCellDimension = () => {
   return { blockWidth, blockHeight };
 };
 
-const createIndexCell = (arr, rowCell = false, colCell = false) => {
-  const fragment = document.createDocumentFragment();
-  const { blockWidth, blockHeight } = getCellDimension();
-  for (let arrElem of arr) {
-    const indexCell = document.createElement("div");
-    indexCell.classList.add("indexCell");
-    indexCell.append(document.createTextNode(arrElem));
-    if (rowCell) {
-      indexCell.style.width = blockWidth + "px";
-    } else {
-      indexCell.style.height = blockHeight + "px";
+const arrangePieces = (cell) => {
+  for (let piece of pieces) {
+    if (piece.pos === cell.id) {
+      const img = new Image(50);
+      img.title = piece.name;
+      img.src = piece.img;
+      cell.append(img);
     }
-    fragment.append(indexCell);
   }
-  return fragment;
 };
 
-const createIndex = (rowCell = false, colCell = false) => {
-  const indexElem = document.createElement("div");
-  let fragment;
-  if (rowCell) {
-    indexElem.classList.add("row");
-    fragment = createIndexCell(row, rowCell, colCell);
+const createCells = (
+  rowElements,
+  isRowCell = false,
+  isColCell = false,
+  colElem = null
+) => {
+  const cellsContainer = document.createElement("div");
+  const fragment = document.createDocumentFragment();
+  const { blockWidth, blockHeight } = getCellDimension();
+  for (let rowElem of rowElements) {
+    const cell = document.createElement("div");
+    let uniqueName;
+    if (!colElem) {
+      uniqueName = rowElem;
+      cell.append(document.createTextNode(uniqueName));
+    } else {
+      uniqueName = rowElem + colElem;
+      // fill cell
+      fillCell(uniqueName, cell);
+    }
+    cell.id = uniqueName;
+    cell.title = uniqueName;
+    cell.classList.add("cell");
+    if (isRowCell) {
+      cellsContainer.classList.add("row");
+      cell.style.width = blockWidth + "px";
+    }
+    if (isColCell) {
+      cellsContainer.classList.add("col");
+      cell.style.height = blockHeight + "px";
+    }
+    fragment.append(cell);
+
+    // arrange pieces
+    arrangePieces(cell);
   }
-  if (colCell) {
-    indexElem.classList.add("col");
-    fragment = createIndexCell(col, rowCell, colCell);
+  cellsContainer.append(fragment);
+  return cellsContainer;
+};
+
+const createIndex = (isRowCell = false, isColCell = false) => {
+  let indexElem;
+  if (isRowCell) {
+    indexElem = createCells(row, isRowCell, isColCell);
   }
-  indexElem.append(fragment);
+  if (isColCell) {
+    indexElem = createCells(col, isRowCell, isColCell);
+  }
   chessBoardElem.insertAdjacentElement("beforebegin", indexElem);
 };
 
-const createBlocks = (count, p) => {
-  const blocks = document.createElement("div");
-  blocks.classList.add("chess_block");
-
-  // fill block
-  fillBlock(count, blocks);
-
-  blocks.append(document.createTextNode(p));
-  blocks.style.fontSize = "1.1rem";
-  const { blockWidth, blockHeight } = getCellDimension();
-  blocks.style.width = blockWidth + "px";
-  blocks.style.height = blockHeight + "px";
-  return blocks;
-};
-
-let blocksNo = 1;
-let pos = 1;
-window.addEventListener("DOMContentLoaded", () => {
+const createBlocks = () => {
   const fragment = document.createDocumentFragment();
-  let p;
-  while (blocksNo <= 64) {
-    p = row[pos - 1];
-    console.log(p);
-    if (pos === 8) {
-      console.log("reset");
-      pos = 1;
-    }
-    fragment.append(createBlocks(blocksNo, p));
-    pos++;
-    blocksNo++;
+  for (let colElem of col) {
+    const elem = createCells(row, true, true, colElem);
+    fragment.append(elem);
   }
   chessBoardElem.append(fragment);
+};
+
+window.addEventListener("DOMContentLoaded", () => {
+  createBlocks();
   createIndex(true, false);
   createIndex(false, true);
 });

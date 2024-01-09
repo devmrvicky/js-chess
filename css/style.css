@@ -2,6 +2,7 @@
   padding: 0;
   margin: 0;
   box-sizing: border-box;
+  font-family: poppins;
 }
 
 body {
@@ -23,22 +24,18 @@ main {
   grid-template-rows: auto auto;
 }
 
-.col {
-
-  padding: 0 10px;
-}
-
 #chess-board {
   width: 560px;
   height: 560px;
   border: 1px solid;
   display: flex;
   flex-wrap: wrap;
+  margin: 5px 10px;
 }
 
-.chess_block,
+
 .row,
-.indexCell {
+.cell {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -46,10 +43,10 @@ main {
   flex-grow: 1;
 }
 
-.chess_block.filledBlock {
-  background-color: #cfcdcd;
+img {
+  /* width: 100%; */
 }
 
-.indexCell {
-  padding: 5px 0;
+.filledBlock {
+  background-color: #cfcdcd;
 }
