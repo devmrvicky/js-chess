@@ -1,0 +1,55 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+body {
+  width: 100%;
+  min-height: 100vh;
+}
+
+main {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#chess-board-container {
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-template-rows: auto auto;
+}
+
+.col {
+
+  padding: 0 10px;
+}
+
+#chess-board {
+  width: 560px;
+  height: 560px;
+  border: 1px solid;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.chess_block,
+.row,
+.indexCell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fff;
+  flex-grow: 1;
+}
+
+.chess_block.filledBlock {
+  background-color: #cfcdcd;
+}
+
+.indexCell {
+  padding: 5px 0;
+}
