@@ -3,7 +3,7 @@ if (import.meta.hot) {
   import.meta.hot.accept();
 }
 
-import pieces from "./peices";
+import pieces from "./pieces";
 import move from "./move";
 
 const chessBoardElem = document.querySelector("#chess-board");
@@ -62,67 +62,76 @@ const arrangePieces = (cell) => {
       initPieceImgInCell(cell, piece);
     }
   }
+  // piece moves (for checking move logic go to move.js file)
   move(cell);
 };
 
-const createCells = (
+const createOneContainerRowOfCells = (
   rowElements,
-  isRowCell = false,
-  isColCell = false,
+  cellWidth = false,
+  cellHeight = false,
   colElem = null
 ) => {
-  const cellsContainer = document.createElement("div");
+  const cellsContainerRow = document.createElement("div");
   const fragment = document.createDocumentFragment();
   const { blockWidth, blockHeight } = getCellDimension();
   for (let rowElem of rowElements) {
     const cell = document.createElement("div");
-    let uniqueName;
+    let uniqueCellName;
     if (!colElem) {
-      uniqueName = rowElem;
-      cell.append(document.createTextNode(uniqueName));
+      // this only for row and col indexes
+      uniqueCellName = rowElem;
+      cell.append(document.createTextNode(uniqueCellName));
     } else {
-      uniqueName = rowElem + colElem;
-      // fill cell
-      fillCell(uniqueName, cell);
+      uniqueCellName = rowElem + colElem;
+      // fill cell (fill cell background)
+      fillCell(uniqueCellName, cell);
     }
-    cell.title = uniqueName;
-    cell.id = uniqueName;
+    // create pieces cell meta data like title, id etc.
+    cell.title = uniqueCellName;
+    cell.id = uniqueCellName;
     cell.classList.add("cell");
-    if (isRowCell && isColCell) {
+    // here  if cellWidth and cellHeight are both true means this cell contain any of piece
+    if (cellWidth && cellHeight) {
       cell.classList.add("emptyCell");
     }
-    if (isRowCell) {
-      cellsContainer.classList.add("row");
+    // if only cellWidth true means it is index row
+    if (cellWidth) {
+      cellsContainerRow.classList.add("row");
       cell.style.width = blockWidth + "px";
     }
-    if (isColCell) {
-      cellsContainer.classList.add("col");
+    // and only if cellHeight is true means it is index col
+    if (cellHeight) {
+      cellsContainerRow.classList.add("col");
       cell.style.height = blockHeight + "px";
     }
     fragment.append(cell);
 
-    // arrange pieces
+    // arrange pieces on it's initial phase
+    // we call arrangePieces function here because we got cell element here
     arrangePieces(cell);
   }
-  cellsContainer.append(fragment);
-  return cellsContainer;
+  cellsContainerRow.append(fragment);
+  return cellsContainerRow;
 };
 
-const createIndex = (isRowCell = false, isColCell = false) => {
+const createIndex = (cellWidth = false, cellHeight = false) => {
   let indexElem;
-  if (isRowCell) {
-    indexElem = createCells(row, isRowCell, isColCell);
+  // if only cellWidth true means it is index row
+  if (cellWidth) {
+    indexElem = createOneContainerRowOfCells(row, cellWidth, cellHeight);
   }
-  if (isColCell) {
-    indexElem = createCells(col, isRowCell, isColCell);
+  // and only if cellHeight is true means it is index col
+  if (cellHeight) {
+    indexElem = createOneContainerRowOfCells(col, cellWidth, cellHeight);
   }
   chessBoardElem.insertAdjacentElement("beforebegin", indexElem);
 };
 
-const createBlocks = () => {
+const createAllContainerRowsOfCells = () => {
   const fragment = document.createDocumentFragment();
   for (let colElem of col) {
-    const elem = createCells(row, true, true, colElem);
+    const elem = createOneContainerRowOfCells(row, true, true, colElem);
     fragment.append(elem);
   }
   chessBoardElem.append(fragment);
@@ -130,7 +139,7 @@ const createBlocks = () => {
 
 const gameInit = () => {
   if (chessBoardElem.children.length) return;
-  createBlocks();
+  createAllContainerRowsOfCells();
   createIndex(true, false);
   createIndex(false, true);
 };

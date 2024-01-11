@@ -4,15 +4,26 @@ if (import.meta.hot) {
 }
 
 import { initPieceImgInCell } from "./main";
-import pieces from "./peices";
+import pieces from "./pieces";
 
+let moveChance = "white";
 const moves = {
   pawn: [],
 };
 
-const determineNextStepOfPiece = (data) => {
-  const { pieceName, pieceVariant, piecePos } = data.dataset;
-  if (!pieceName) return null;
+// change chances
+const changeChances = async (pieceVariant) => {
+  try {
+    moveChance = pieceVariant;
+    return true;
+  } catch (error) {
+    return false;
+  }
+};
+
+const determineNextStepOfPiece = async (pieceData) => {
+  const { pieceName, pieceVariant, piecePos } = pieceData.dataset;
+  if (pieceName) return null;
   const colNo = Number(piecePos[1]);
   const nextPos = [`${piecePos[0]}${colNo + 1}`, `${piecePos[0]}${colNo + 2}`];
   return nextPos;
@@ -20,7 +31,6 @@ const determineNextStepOfPiece = (data) => {
 
 const clearPreviousTryMove = (cells) => {
   for (let cell of cells) {
-    // console.log(cell);
     if (cell.classList.contains("nextPos")) {
       cell.classList.remove("nextPos");
     }
@@ -37,36 +47,23 @@ const resetPreviousCell = (cell) => {
 };
 
 const move = (cell) => {
-  // addEventListen
+  // addEventListen to desire pice cell
   cell.addEventListener("click", (e) => {
-    // pawn moves condition
-    /*
-      1. check if it is black or white piece - white
-      2. check if it is new in move or it have moved once
-      3. if new it will move two step or one step
-    */
-
-    if (!moves.pawn.length) {
-      // console.log("first move of pawn");
-    } else {
-      // console.log("pawn moved once already");
-    }
     const nextPos = determineNextStepOfPiece(e.currentTarget);
-
-    // get all empty cell elements
-    const cells = document.querySelectorAll(".emptyCell");
-
-    // clear previous click
-    clearPreviousTryMove(cells);
     if (!nextPos) return;
+    // get all empty cell elements
+    const emptyCells = document.querySelectorAll(".emptyCell");
+    // clear previous click
+    clearPreviousTryMove(emptyCells);
     for (let pos of nextPos) {
-      for (let cellElem of cells) {
-        if (pos === cellElem.id) {
-          cellElem.classList.add("nextPos");
-          cellElem.addEventListener("click", () => {
+      for (let emptyCell of emptyCells) {
+        if (pos === emptyCell.id) {
+          emptyCell.classList.add("nextPos");
+          emptyCell.addEventListener("click", () => {
             const pieceId = cell.dataset.pieceId;
             const pieceInfo = pieces.find((piece) => piece.id === pieceId);
-            initPieceImgInCell(cellElem, pieceInfo);
+            // console.log(pieceInfo);
+            initPieceImgInCell(emptyCell, pieceInfo);
             // reset previous cell
             resetPreviousCell(cell);
           });
@@ -77,3 +74,10 @@ const move = (cell) => {
 };
 
 export default move;
+
+/*
+  1. first check white move or dark by default white
+  2. which piece choose to move 
+      1. if choose pawn and it's first move then give option for two step or if it's diagonal has any opposition then kill that piece and if it's not first move the give one step option to move
+      2. if choose rook, it will move straight way
+*/
