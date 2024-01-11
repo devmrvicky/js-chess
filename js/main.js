@@ -1,3 +1,8 @@
+// app.js
+if (import.meta.hot) {
+  import.meta.hot.accept();
+}
+
 import pieces from "./peices";
 import move from "./move";
 
@@ -44,20 +49,19 @@ const initPieceImgInCell = (cell, piece) => {
   cell.setAttribute("data-piece-name", piece.name);
   cell.setAttribute("data-piece-variant", piece.id.split("-")[0]);
   cell.setAttribute("data-piece-pos", cell.id);
+  cell.setAttribute("data-piece-id", piece.id);
   const img = new Image(40);
   img.src = piece.img;
   img.title = piece.name;
-  return img;
+  cell.append(img);
 };
 
 const arrangePieces = (cell) => {
   for (let piece of pieces) {
     if (piece.pos === cell.id) {
-      const img = initPieceImgInCell(cell, piece);
-      cell.append(img);
+      initPieceImgInCell(cell, piece);
     }
   }
-
   move(cell);
 };
 
@@ -125,6 +129,7 @@ const createBlocks = () => {
 };
 
 const gameInit = () => {
+  if (chessBoardElem.children.length) return;
   createBlocks();
   createIndex(true, false);
   createIndex(false, true);

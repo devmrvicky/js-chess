@@ -1,4 +1,10 @@
+// app.js
+if (import.meta.hot) {
+  import.meta.hot.accept();
+}
+
 import { initPieceImgInCell } from "./main";
+import pieces from "./peices";
 
 const moves = {
   pawn: [],
@@ -19,6 +25,15 @@ const clearPreviousTryMove = (cells) => {
       cell.classList.remove("nextPos");
     }
   }
+};
+
+const resetPreviousCell = (cell) => {
+  cell.classList.add("emptyCell");
+  cell.removeAttribute("data-piece-name");
+  cell.removeAttribute("data-piece-variant");
+  cell.removeAttribute("data-piece-pos");
+  cell.removeAttribute("data-piece-id");
+  cell.children[0].remove();
 };
 
 const move = (cell) => {
@@ -49,7 +64,11 @@ const move = (cell) => {
         if (pos === cellElem.id) {
           cellElem.classList.add("nextPos");
           cellElem.addEventListener("click", () => {
-            // initPieceImgInCell(cellElem, { name: "pawn", id: cell.id });
+            const pieceId = cell.dataset.pieceId;
+            const pieceInfo = pieces.find((piece) => piece.id === pieceId);
+            initPieceImgInCell(cellElem, pieceInfo);
+            // reset previous cell
+            resetPreviousCell(cell);
           });
         }
       }
