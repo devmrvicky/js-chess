@@ -51,6 +51,7 @@ const initPieceImgInCell = (cell, piece) => {
   cell.setAttribute("data-piece-pos", cell.id);
   cell.setAttribute("data-piece-id", piece.id);
   const img = new Image(40);
+
   img.src = piece.img;
   img.title = piece.name;
   cell.append(img);
