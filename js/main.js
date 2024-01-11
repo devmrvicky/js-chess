@@ -1,4 +1,5 @@
 import pieces from "./peices";
+import move from "./move";
 
 const chessBoardElem = document.querySelector("#chess-board");
 
@@ -37,15 +38,27 @@ const getCellDimension = () => {
   return { blockWidth, blockHeight };
 };
 
+// create img
+const initPieceImgInCell = (cell, piece) => {
+  cell.classList.remove("emptyCell");
+  cell.setAttribute("data-piece-name", piece.name);
+  cell.setAttribute("data-piece-variant", piece.id.split("-")[0]);
+  cell.setAttribute("data-piece-pos", cell.id);
+  const img = new Image(40);
+  img.src = piece.img;
+  img.title = piece.name;
+  return img;
+};
+
 const arrangePieces = (cell) => {
   for (let piece of pieces) {
     if (piece.pos === cell.id) {
-      const img = new Image(50);
-      img.title = piece.name;
-      img.src = piece.img;
+      const img = initPieceImgInCell(cell, piece);
       cell.append(img);
     }
   }
+
+  move(cell);
 };
 
 const createCells = (
@@ -68,9 +81,12 @@ const createCells = (
       // fill cell
       fillCell(uniqueName, cell);
     }
-    cell.id = uniqueName;
     cell.title = uniqueName;
+    cell.id = uniqueName;
     cell.classList.add("cell");
+    if (isRowCell && isColCell) {
+      cell.classList.add("emptyCell");
+    }
     if (isRowCell) {
       cellsContainer.classList.add("row");
       cell.style.width = blockWidth + "px";
@@ -108,8 +124,14 @@ const createBlocks = () => {
   chessBoardElem.append(fragment);
 };
 
-window.addEventListener("DOMContentLoaded", () => {
+const gameInit = () => {
   createBlocks();
   createIndex(true, false);
   createIndex(false, true);
+};
+
+window.addEventListener("DOMContentLoaded", () => {
+  gameInit();
 });
+
+export { initPieceImgInCell };
