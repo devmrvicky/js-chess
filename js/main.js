@@ -44,26 +44,36 @@ const getCellDimension = () => {
 };
 
 // create img
-const initPieceImgInCell = (cell, piece) => {
-  cell.classList.remove("emptyCell");
-  cell.setAttribute("data-piece-name", piece.name);
-  cell.setAttribute("data-piece-variant", piece.id.split("-")[0]);
-  cell.setAttribute("data-piece-pos", cell.id);
-  cell.setAttribute("data-piece-id", piece.id);
-  const img = new Image(40);
-  img.src = piece.img;
-  img.title = piece.name;
-  cell.append(img);
+const initPieceImgInCell = async (cell, piece) => {
+  try {
+    cell.classList.remove("emptyCell");
+    cell.setAttribute("data-piece-name", piece.name);
+    cell.setAttribute("data-piece-variant", piece.id.split("-")[0]);
+    cell.setAttribute("data-piece-pos", cell.id);
+    cell.setAttribute("data-piece-id", piece.id);
+    // create img
+    const img = new Image(40);
+    img.src = piece.img;
+    img.title = piece.name;
+    cell.append(img);
+    return true;
+  } catch (error) {
+    console.error(error.message);
+  }
 };
 
-const arrangePieces = (cell) => {
-  for (let piece of pieces) {
-    if (piece.pos === cell.id) {
-      initPieceImgInCell(cell, piece);
+const arrangePieces = async (cell) => {
+  try {
+    for (let piece of pieces) {
+      if (piece.pos === cell.id) {
+        await initPieceImgInCell(cell, piece);
+      }
     }
+    // piece moves (for checking move logic go to move.js file)
+    move(cell);
+  } catch (error) {
+    console.error(error.message);
   }
-  // piece moves (for checking move logic go to move.js file)
-  move(cell);
 };
 
 const createOneContainerRowOfCells = (

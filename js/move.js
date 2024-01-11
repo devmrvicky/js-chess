@@ -8,7 +8,8 @@ import pieces from "./pieces";
 
 let moveChance = "white";
 const moves = {
-  pawn: [],
+  white: { pawn: [] },
+  black: { pawn: [] },
 };
 
 // change chances
@@ -21,11 +22,38 @@ const changeChances = async (pieceVariant) => {
   }
 };
 
+// all pieces next pos logic
+const pawnNextPos = (piecePos) => {
+  let colNo = Number(piecePos[1]);
+  let totalMovesOfPawn;
+  let nextPos = [];
+  // check if pawn's first move or not
+  if (moves[moveChance].pawn.length) {
+    totalMovesOfPawn = 1;
+  } else {
+    totalMovesOfPawn = 2;
+  }
+  for (let i = 1; i <= totalMovesOfPawn; i++) {
+    colNo++;
+    nextPos.push(`${piecePos[0]}${colNo}`);
+  }
+  // one condition left that is opponent piece kill condition
+  return nextPos;
+};
+
 const determineNextStepOfPiece = async (pieceData) => {
   const { pieceName, pieceVariant, piecePos } = pieceData.dataset;
-  if (pieceName) return null;
-  const colNo = Number(piecePos[1]);
-  const nextPos = [`${piecePos[0]}${colNo + 1}`, `${piecePos[0]}${colNo + 2}`];
+  console.log(
+    `you clicked on ${pieceVariant} ${pieceName} that is on ${piecePos}`
+  );
+  if (pieceVariant !== moveChance) {
+    alert(moveChance + " move");
+    return;
+  }
+  let nextPos;
+  if (pieceName === "pawn") {
+    nextPos = pawnNextPos(piecePos);
+  }
   return nextPos;
 };
 
@@ -46,11 +74,18 @@ const resetPreviousCell = (cell) => {
   cell.children[0].remove();
 };
 
+// update moves history
+const updateMovesHistory = (movedPieceData) => {
+  const { pieceName, pieceVariant, piecePos } = movedPieceData;
+  moves[pieceVariant][pieceName].push(piecePos);
+};
+
 const move = (cell) => {
   // addEventListen to desire pice cell
-  cell.addEventListener("click", (e) => {
-    const nextPos = determineNextStepOfPiece(e.currentTarget);
+  cell.addEventListener("click", async (e) => {
+    const nextPos = await determineNextStepOfPiece(e.currentTarget);
     if (!nextPos) return;
+
     // get all empty cell elements
     const emptyCells = document.querySelectorAll(".emptyCell");
     // clear previous click
@@ -59,13 +94,17 @@ const move = (cell) => {
       for (let emptyCell of emptyCells) {
         if (pos === emptyCell.id) {
           emptyCell.classList.add("nextPos");
-          emptyCell.addEventListener("click", () => {
+          emptyCell.addEventListener("click", async () => {
             const pieceId = cell.dataset.pieceId;
             const pieceInfo = pieces.find((piece) => piece.id === pieceId);
             // console.log(pieceInfo);
-            initPieceImgInCell(emptyCell, pieceInfo);
-            // reset previous cell
-            resetPreviousCell(cell);
+            const cellMoved = await initPieceImgInCell(emptyCell, pieceInfo);
+            if (cellMoved) {
+              // update pieces moves history
+              updateMovesHistory(cell.dataset);
+              // reset previous cell
+              resetPreviousCell(cell);
+            }
           });
         }
       }
