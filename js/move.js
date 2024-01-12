@@ -8,14 +8,38 @@ import pieces from "./pieces";
 
 let moveChance = "white";
 const moves = {
-  white: { pawn: [] },
-  black: { pawn: [] },
+  white: {
+    pawn: {
+      pawn1: [],
+      pawn2: [],
+      pawn3: [],
+      pawn4: [],
+      pawn5: [],
+      pawn6: [],
+      pawn7: [],
+      pawn8: [],
+    },
+  },
+  black: {
+    pawn: {
+      pawn1: [],
+      pawn2: [],
+      pawn3: [],
+      pawn4: [],
+      pawn5: [],
+      pawn6: [],
+      pawn7: [],
+      pawn8: [],
+    },
+  },
 };
 
 // change chances
-const changeChances = async (pieceVariant) => {
+const changeChances = async () => {
   try {
-    moveChance = pieceVariant;
+    if (moveChance === "white") moveChance = "black";
+    else moveChance = "white";
+    console.log(moveChance);
     return true;
   } catch (error) {
     return false;
@@ -23,18 +47,22 @@ const changeChances = async (pieceVariant) => {
 };
 
 // all pieces next pos logic
-const pawnNextPos = (piecePos) => {
+const pawnNextPos = (piecePos, pieceId, pieceVariant) => {
   let colNo = Number(piecePos[1]);
   let totalMovesOfPawn;
   let nextPos = [];
   // check if pawn's first move or not
-  if (moves[moveChance].pawn.length) {
+  if (moves[moveChance].pawn[pieceId].length) {
     totalMovesOfPawn = 1;
   } else {
     totalMovesOfPawn = 2;
   }
   for (let i = 1; i <= totalMovesOfPawn; i++) {
-    colNo++;
+    if (pieceVariant === "white") {
+      colNo++;
+    } else {
+      colNo--;
+    }
     nextPos.push(`${piecePos[0]}${colNo}`);
   }
   // one condition left that is opponent piece kill condition
@@ -42,17 +70,17 @@ const pawnNextPos = (piecePos) => {
 };
 
 const determineNextStepOfPiece = async (pieceData) => {
-  const { pieceName, pieceVariant, piecePos } = pieceData.dataset;
+  const { pieceName, pieceVariant, piecePos, pieceId } = pieceData.dataset;
   console.log(
     `you clicked on ${pieceVariant} ${pieceName} that is on ${piecePos}`
   );
-  if (pieceVariant !== moveChance) {
+  if (pieceName && pieceVariant !== moveChance) {
     alert(moveChance + " move");
     return;
   }
   let nextPos;
   if (pieceName === "pawn") {
-    nextPos = pawnNextPos(piecePos);
+    nextPos = pawnNextPos(piecePos, pieceId.split("-")[1], pieceVariant);
   }
   return nextPos;
 };
@@ -76,8 +104,8 @@ const resetPreviousCell = (cell) => {
 
 // update moves history
 const updateMovesHistory = (movedPieceData) => {
-  const { pieceName, pieceVariant, piecePos } = movedPieceData;
-  moves[pieceVariant][pieceName].push(piecePos);
+  const { pieceName, pieceVariant, piecePos, pieceId } = movedPieceData;
+  moves[pieceVariant][pieceName][pieceId.split("-")[1]].push(piecePos);
 };
 
 const move = (cell) => {
@@ -95,15 +123,22 @@ const move = (cell) => {
         if (pos === emptyCell.id) {
           emptyCell.classList.add("nextPos");
           emptyCell.addEventListener("click", async () => {
-            const pieceId = cell.dataset.pieceId;
-            const pieceInfo = pieces.find((piece) => piece.id === pieceId);
-            // console.log(pieceInfo);
-            const cellMoved = await initPieceImgInCell(emptyCell, pieceInfo);
-            if (cellMoved) {
-              // update pieces moves history
-              updateMovesHistory(cell.dataset);
-              // reset previous cell
-              resetPreviousCell(cell);
+            try {
+              const pieceId = cell.dataset.pieceId;
+              const pieceInfo = pieces.find((piece) => piece.id === pieceId);
+              // console.log(pieceInfo);
+              const cellMoved = await initPieceImgInCell(emptyCell, pieceInfo);
+              if (cellMoved) {
+                clearPreviousTryMove(emptyCells);
+                // update pieces moves history
+                updateMovesHistory(cell.dataset);
+                // reset previous cell
+                resetPreviousCell(cell);
+                // toggle move chance
+                await changeChances();
+              }
+            } catch (error) {
+              console.log(error.message);
             }
           });
         }
