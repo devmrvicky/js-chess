@@ -7,6 +7,7 @@ import pieces from "./pieces";
 import move from "./move";
 
 const chessBoardElem = document.querySelector("#chess-board");
+const gameInfoElem = document.querySelector(".game-info");
 
 const row = ["A", "B", "C", "D", "E", "F", "G", "H"];
 const col = [1, 2, 3, 4, 5, 6, 7, 8];
@@ -159,4 +160,4 @@ window.addEventListener("DOMContentLoaded", () => {
   gameInit();
 });
 
-export { initPieceImgInCell, row, col };
+export { initPieceImgInCell, row, col, gameInfoElem };

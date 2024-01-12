@@ -3,7 +3,7 @@ if (import.meta.hot) {
   import.meta.hot.accept();
 }
 
-import { initPieceImgInCell, row, col } from "./main";
+import { initPieceImgInCell, gameInfoElem, row, col } from "./main";
 import pieces from "./pieces";
 
 let moveChance = "white";
@@ -27,6 +27,12 @@ const moves = {
       knight1: [],
       knight2: [],
     },
+    bishop: {
+      bishop1: [],
+      bishop2: [],
+    },
+    king: [],
+    queen: [],
   },
   black: {
     pawn: {
@@ -43,6 +49,16 @@ const moves = {
       rook1: [],
       rook2: [],
     },
+    knight: {
+      knight1: [],
+      knight2: [],
+    },
+    bishop: {
+      bishop1: [],
+      bishop2: [],
+    },
+    king: [],
+    queen: [],
   },
 };
 
@@ -91,6 +107,13 @@ const rookNextPos = (piecePos, moveBlockedCells) => {
     if (piecePos !== nextSinglePos) {
       nextPos.push(nextSinglePos);
     }
+    // for (let moveBlockedCell of moveBlockedCells) {
+    //   if (nextSinglePos === moveBlockedCell) {
+    //     console.log({ nextSinglePos, moveBlockedCell });
+    //     return;
+    //   }
+
+    // }
   }
   // row position
   for (let rowPos of row) {
@@ -99,8 +122,9 @@ const rookNextPos = (piecePos, moveBlockedCells) => {
       nextPos.push(nextSinglePos);
     }
   }
-  // console.log(nextPos);
-  return nextPos.filter((pos) => !moveBlockedCells.includes(pos));
+  console.log(moveBlockedCells.filter((cell) => cell[0] === piecePos[0]));
+  // console.log(nextPos.filter((pos) => moveBlockedCells.includes(pos)));
+  return nextPos;
 };
 // knight
 const KnightNextPos = (piecePos) => {
@@ -144,7 +168,6 @@ const KnightNextPos = (piecePos) => {
   if (rowNo <= 5) {
     rowPosOfKnight("right");
   }
-  console.log(nextPos);
   return nextPos;
 };
 // bishop
@@ -152,25 +175,70 @@ const bishopNextPos = (piecePos) => {
   let colNo = Number(piecePos[1]);
   let rowNo = row.indexOf(piecePos[0]);
   let nextPos = [];
-  // if (colNo > 1) {
-  // go upper left
-  let temp = colNo - 1;
-  while (temp >= 1) {
-    rowNo--;
-    console.log({ temp, rowNo });
-    let nextSinglePos = `${row[rowNo]}${temp}`;
-    nextPos.push(nextSinglePos);
-    temp--;
+  const upperMovesPos = (dir) => {
+    let temp = colNo - 1;
+    while (temp >= 1) {
+      if (dir === "left") {
+        rowNo--;
+      } else if (dir === "right") {
+        rowNo++;
+      }
+      let nextSinglePos = `${row[rowNo]}${temp}`;
+      nextPos.push(nextSinglePos);
+      temp--;
+    }
+    rowNo = row.indexOf(piecePos[0]);
+  };
+
+  const downMovesPos = (dir) => {
+    let temp = colNo + 1;
+    while (temp <= 8) {
+      if (dir === "left") {
+        rowNo--;
+      } else if (dir === "right") {
+        rowNo++;
+      }
+      let nextSinglePos = `${row[rowNo]}${temp}`;
+      nextPos.push(nextSinglePos);
+      temp++;
+    }
+    rowNo = row.indexOf(piecePos[0]);
+  };
+  // upper left
+  upperMovesPos("left");
+  upperMovesPos("right");
+  downMovesPos("left");
+  downMovesPos("right");
+  return nextPos;
+};
+// queen
+const queenNextPos = (piecePos) => [
+  ...bishopNextPos(piecePos),
+  ...rookNextPos(piecePos),
+];
+// king
+const kingNextPos = (piecePos) => {
+  const colNo = Number(piecePos[1]);
+  let rowNo = row.indexOf(piecePos[0]);
+  const nextPos = [];
+  nextPos.push(`${piecePos[0]}${colNo + 1}`, `${piecePos[0]}${colNo - 1}`);
+  function moveColDir(dir) {
+    if (dir === "left") {
+      rowNo--;
+    } else if (dir === "right") {
+      rowNo++;
+    }
+    let temp = colNo - 1;
+    while (temp <= colNo + 1) {
+      nextPos.push(`${row[rowNo]}${temp}`);
+      temp++;
+    }
+    rowNo = row.indexOf(piecePos[0]);
   }
-  let temp2 = colNo + 1;
-  while (temp2 <= 8) {
-    rowNo++;
-    console.log({ temp, rowNo });
-    let nextSinglePos = `${row[rowNo]}${temp2}`;
-    nextPos.push(nextSinglePos);
-    temp2++;
-  }
-  // }
+  // left
+  moveColDir("left");
+  // right
+  moveColDir("right");
   return nextPos;
 };
 
@@ -198,6 +266,10 @@ const determineNextStepOfPiece = async (pieceData) => {
     nextPos = KnightNextPos(piecePos);
   } else if (pieceName === "bishop") {
     nextPos = bishopNextPos(piecePos);
+  } else if (pieceName === "queen") {
+    nextPos = queenNextPos(piecePos);
+  } else if (pieceName === "king") {
+    nextPos = kingNextPos(piecePos);
   }
   return nextPos;
 };
@@ -211,20 +283,30 @@ const clearPreviousTryMove = (cells) => {
 };
 
 // reset previous cell that had piece
-const resetPreviousCell = (cell) => {
-  cell.classList.add("emptyCell");
-  cell.removeAttribute("data-piece-name");
-  cell.removeAttribute("data-piece-variant");
-  cell.removeAttribute("data-piece-pos");
-  cell.removeAttribute("data-piece-id");
-  cell.removeAttribute("data-piece-available");
-  cell.children[0].remove();
+const resetPreviousCell = async (cell) => {
+  try {
+    cell.classList.add("emptyCell");
+    cell.removeAttribute("data-piece-name");
+    cell.removeAttribute("data-piece-variant");
+    cell.removeAttribute("data-piece-pos");
+    cell.removeAttribute("data-piece-id");
+    cell.removeAttribute("data-piece-available");
+    cell.children[0].remove();
+    return true;
+  } catch (error) {
+    console.log("unable to reset previous cell :: ", error.message);
+    return false;
+  }
 };
 
 // update moves history
 const updateMovesHistory = (movedPieceData) => {
   const { pieceName, pieceVariant, piecePos, pieceId } = movedPieceData;
-  moves[pieceVariant][pieceName][pieceId.split("-")[1]].push(piecePos);
+  if (pieceName === "king" || pieceName === "queen") {
+    moves[pieceVariant][pieceName].push(piecePos);
+  } else {
+    moves[pieceVariant][pieceName][pieceId.split("-")[1]].push(piecePos);
+  }
 };
 
 const move = (cell) => {
@@ -252,15 +334,20 @@ const move = (cell) => {
                 // update pieces moves history
                 updateMovesHistory(cell.dataset);
                 // reset previous cell
-                resetPreviousCell(cell);
+                await resetPreviousCell(cell);
                 // toggle move chance
-                await changeChances();
+                const chanceChanged = await changeChances();
+                if (chanceChanged) {
+                  // console.log(gameInfoElem);
+                  // gameInfoElem.children[0].remove();
+                  // gameInfoElem.append(document.createTextNode(moveChance));
+                  gameInfoElem.textContent = moveChance;
+                }
               }
             } catch (error) {
               console.log(error.message);
             }
           });
-          break;
         }
       }
     }
