@@ -3,7 +3,7 @@ if (import.meta.hot) {
   import.meta.hot.accept();
 }
 
-import { initPieceImgInCell } from "./main";
+import { initPieceImgInCell, row, col } from "./main";
 import pieces from "./pieces";
 
 let moveChance = "white";
@@ -19,6 +19,14 @@ const moves = {
       pawn7: [],
       pawn8: [],
     },
+    rook: {
+      rook1: [],
+      rook2: [],
+    },
+    knight: {
+      knight1: [],
+      knight2: [],
+    },
   },
   black: {
     pawn: {
@@ -30,6 +38,10 @@ const moves = {
       pawn6: [],
       pawn7: [],
       pawn8: [],
+    },
+    rook: {
+      rook1: [],
+      rook2: [],
     },
   },
 };
@@ -47,6 +59,7 @@ const changeChances = async () => {
 };
 
 // all pieces next pos logic
+// pawn
 const pawnNextPos = (piecePos, pieceId, pieceVariant) => {
   let colNo = Number(piecePos[1]);
   let totalMovesOfPawn;
@@ -68,6 +81,98 @@ const pawnNextPos = (piecePos, pieceId, pieceVariant) => {
   // one condition left that is opponent piece kill condition
   return nextPos;
 };
+// rook
+const rookNextPos = (piecePos, moveBlockedCells) => {
+  // console.log(moveBlockedCells);
+  const nextPos = [];
+  // col position
+  for (let colPos of col) {
+    let nextSinglePos = `${piecePos[0]}${colPos}`;
+    if (piecePos !== nextSinglePos) {
+      nextPos.push(nextSinglePos);
+    }
+  }
+  // row position
+  for (let rowPos of row) {
+    let nextSinglePos = `${rowPos}${piecePos[1]}`;
+    if (piecePos !== nextSinglePos) {
+      nextPos.push(nextSinglePos);
+    }
+  }
+  // console.log(nextPos);
+  return nextPos.filter((pos) => !moveBlockedCells.includes(pos));
+};
+// knight
+const KnightNextPos = (piecePos) => {
+  let colNo = Number(piecePos[1]);
+  let rowNo = row.indexOf(piecePos[0]);
+  let nextPos = [];
+
+  function colPosOfKnight(dir) {
+    console.log(dir);
+    let temp;
+    if (dir === "up") {
+      temp = Math.abs(colNo - 2);
+    } else if (dir === "down") {
+      temp = Math.abs(colNo + 2);
+    }
+    const leftMove = `${row[rowNo - 1]}${temp}`;
+    const rightMove = `${row[rowNo + 1]}${temp}`;
+    nextPos = [...nextPos, leftMove, rightMove];
+  }
+
+  if (colNo >= 3) {
+    colPosOfKnight("up");
+  }
+  if (colNo <= 6) {
+    colPosOfKnight("down");
+  }
+  function rowPosOfKnight(dir) {
+    let temp;
+    if (dir === "right") {
+      temp = rowNo + 2;
+    } else if (dir === "left") {
+      temp = rowNo - 2;
+    }
+    const upMove = `${row[temp]}${colNo + 1}`;
+    const downMove = `${row[temp]}${colNo - 1}`;
+    nextPos = [...nextPos, upMove, downMove];
+  }
+  if (rowNo >= 2) {
+    rowPosOfKnight("left");
+  }
+  if (rowNo <= 5) {
+    rowPosOfKnight("right");
+  }
+  console.log(nextPos);
+  return nextPos;
+};
+// bishop
+const bishopNextPos = (piecePos) => {
+  let colNo = Number(piecePos[1]);
+  let rowNo = row.indexOf(piecePos[0]);
+  let nextPos = [];
+  // if (colNo > 1) {
+  // go upper left
+  let temp = colNo - 1;
+  while (temp >= 1) {
+    rowNo--;
+    console.log({ temp, rowNo });
+    let nextSinglePos = `${row[rowNo]}${temp}`;
+    nextPos.push(nextSinglePos);
+    temp--;
+  }
+  let temp2 = colNo + 1;
+  while (temp2 <= 8) {
+    rowNo++;
+    console.log({ temp, rowNo });
+    let nextSinglePos = `${row[rowNo]}${temp2}`;
+    nextPos.push(nextSinglePos);
+    temp2++;
+  }
+  // }
+  return nextPos;
+};
 
 const determineNextStepOfPiece = async (pieceData) => {
   const { pieceName, pieceVariant, piecePos, pieceId } = pieceData.dataset;
@@ -78,9 +183,21 @@ const determineNextStepOfPiece = async (pieceData) => {
     alert(moveChance + " move");
     return;
   }
+  const moveBlockedCells = Array.from(
+    document.querySelectorAll('[data-piece-available="true"]')
+  )
+    .map((cellElem) => piecePos !== cellElem.id && cellElem.id)
+    .filter((cellId) => cellId);
   let nextPos;
   if (pieceName === "pawn") {
     nextPos = pawnNextPos(piecePos, pieceId.split("-")[1], pieceVariant);
+  } else if (pieceName === "rook") {
+    nextPos = rookNextPos(piecePos, moveBlockedCells);
+    // console.log(nextPos);
+  } else if (pieceName === "knight") {
+    nextPos = KnightNextPos(piecePos);
+  } else if (pieceName === "bishop") {
+    nextPos = bishopNextPos(piecePos);
   }
   return nextPos;
 };
@@ -93,12 +210,14 @@ const clearPreviousTryMove = (cells) => {
   }
 };
 
+// reset previous cell that had piece
 const resetPreviousCell = (cell) => {
   cell.classList.add("emptyCell");
   cell.removeAttribute("data-piece-name");
   cell.removeAttribute("data-piece-variant");
   cell.removeAttribute("data-piece-pos");
   cell.removeAttribute("data-piece-id");
+  cell.removeAttribute("data-piece-available");
   cell.children[0].remove();
 };
 
@@ -127,8 +246,8 @@ const move = (cell) => {
               const pieceId = cell.dataset.pieceId;
               const pieceInfo = pieces.find((piece) => piece.id === pieceId);
               // console.log(pieceInfo);
-              const cellMoved = await initPieceImgInCell(emptyCell, pieceInfo);
-              if (cellMoved) {
+              const pieceMoved = await initPieceImgInCell(emptyCell, pieceInfo);
+              if (pieceMoved) {
                 clearPreviousTryMove(emptyCells);
                 // update pieces moves history
                 updateMovesHistory(cell.dataset);
@@ -141,6 +260,7 @@ const move = (cell) => {
               console.log(error.message);
             }
           });
+          break;
         }
       }
     }

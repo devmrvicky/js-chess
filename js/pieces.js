@@ -43,7 +43,7 @@ const pieces = [
     img: darkKnight,
   },
   { pos: "A8", id: "black-rook1", name: "rook", img: darkRook },
-  { pos: "H8", id: "black-rook", name: "rook", img: darkRook },
+  { pos: "H8", id: "black-rook2", name: "rook", img: darkRook },
   { pos: "A7", id: "black-pawn1", name: "pawn", img: darkPawn },
   { pos: "B7", id: "black-pawn2", name: "pawn", img: darkPawn },
   { pos: "C7", id: "black-pawn3", name: "pawn", img: darkPawn },
@@ -85,7 +85,7 @@ const pieces = [
     img: lightKnight,
   },
   { pos: "A1", id: "white-rook1", name: "rook", img: lightRook },
-  { pos: "H1", id: "white-rook", name: "rook", img: lightRook },
+  { pos: "H1", id: "white-rook2", name: "rook", img: lightRook },
   { pos: "A2", id: "white-pawn1", name: "pawn", img: lightPawn },
   { pos: "B2", id: "white-pawn2", name: "pawn", img: lightPawn },
   { pos: "C2", id: "white-pawn3", name: "pawn", img: lightPawn },
@@ -96,4 +96,10 @@ const pieces = [
   { pos: "H2", id: "white-pawn8", name: "pawn", img: lightPawn },
 ];
 
-export default pieces;
+const rook = [
+  { pos: "D1", id: "white-bishop1", name: "bishop", img: lightBishop },
+  { pos: "H8", id: "black-rook2", name: "rook", img: darkRook },
+];
+
+// export default pieces;
+export default rook;

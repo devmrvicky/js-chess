@@ -51,6 +51,7 @@ const initPieceImgInCell = async (cell, piece) => {
     cell.setAttribute("data-piece-variant", piece.id.split("-")[0]);
     cell.setAttribute("data-piece-pos", cell.id);
     cell.setAttribute("data-piece-id", piece.id);
+    cell.setAttribute("data-piece-available", true);
     // create img
     const img = new Image(40);
     img.src = piece.img;
@@ -158,4 +159,4 @@ window.addEventListener("DOMContentLoaded", () => {
   gameInit();
 });
 
-export { initPieceImgInCell };
+export { initPieceImgInCell, row, col };
