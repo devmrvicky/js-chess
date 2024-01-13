@@ -6,6 +6,7 @@ if (import.meta.hot) {
 import { initPieceImgInCell, gameInfoElem, row, col } from "./main";
 import pieces from "./pieces";
 import { capturePiece } from "./capturePieces";
+import { createMovingHistory } from "./movesHistory";
 
 let moveChance = "white";
 const moves = {
@@ -62,6 +63,25 @@ const moves = {
     queen: [],
   },
 };
+
+// class for creating object
+class CreatePieceMovingHistoryObj {
+  constructor(
+    pieceName = null,
+    pieceImg = null,
+    startingCell = null,
+    endingCell = null,
+    capturedPice = null,
+    capturedPieceImg = null
+  ) {
+    this.pieceName = pieceName;
+    this.pieceImg = pieceImg;
+    this.startingCell = startingCell;
+    this.endingCell = endingCell;
+    this.capturedPice = capturedPice;
+    this.capturedPieceImg = capturedPieceImg;
+  }
+}
 
 // change chances
 const changeChances = async () => {
@@ -379,7 +399,7 @@ const capturePieceOrMove = async (
   capture = false
 ) => {
   try {
-    const pieceId = cell.dataset.pieceId;
+    const { pieceId, pieceName, piecePos } = cell.dataset;
     const pieceInfo = pieces.find((piece) => piece.id === pieceId);
     // console.log(pieceInfo);
     if (targetCell.children[0] && capture) {
@@ -399,6 +419,14 @@ const capturePieceOrMove = async (
         // gameInfoElem.children[0].remove();
         // gameInfoElem.append(document.createTextNode(moveChance));
         gameInfoElem.textContent = moveChance;
+        // update moves history
+        const pieceMovingDataObj = new CreatePieceMovingHistoryObj(
+          pieceName,
+          pieceInfo.img,
+          piecePos,
+          targetCell.dataset.piecePos
+        );
+        createMovingHistory(pieceMovingDataObj);
       }
       return true;
     } else {
@@ -411,7 +439,7 @@ const capturePieceOrMove = async (
 };
 
 export default move;
-export { capturePieceOrMove };
+export { capturePieceOrMove, CreatePieceMovingHistoryObj };
 
 /*
   1. first check white move or dark by default white
