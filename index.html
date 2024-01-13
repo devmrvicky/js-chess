@@ -17,14 +17,97 @@
 </head>
 
 <body>
-  <h1>chess game</h1>
+  <!-- <h1>chess game</h1> -->
   <main>
-    <div class="game-info">
-      white
-    </div>
-    <div id="chess-board-container">
-      <div class="blank-cell"></div>
-      <div id="chess-board"></div>
+    <div class="game-container">
+      <!-- player info container -->
+      <div id="player-info-container">
+        <div class="player-1 player">
+          <div class="player-profile">
+            <div class="avatar">
+              <img src="./img/br.png" alt="player1">
+            </div>
+            <div class="player-name">
+              <p>Player 1</p>
+              <span>white</span>
+            </div>
+          </div>
+          <p>Dead pieces</p>
+          <div class="pieces">
+            <div class="king">
+              <div class="piece-img">
+                <img src="./img/dark-king.png" alt="dark-king">
+              </div>
+            </div>
+            <div class="rook">
+              <div class="piece-img">
+                <img src="./img/dark-rook.png" alt="dark-rook">
+              </div>
+              <div class="piece-img">
+                <img src="./img/dark-rook.png" alt="dark-rook">
+              </div>
+            </div>
+          </div>
+        </div>
+        <hr>
+        <div class="player-2 player">
+          <div class="player-profile">
+            <div class="avatar">
+              <img src="./img/br.png" alt="player2">
+            </div>
+            <div class="player-name">
+              <p>Player 2</p>
+              <span>black</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- chess board container -->
+      <div id="chess-board-container">
+        <div class="blank-cell"></div>
+        <div id="chess-board"></div>
+      </div>
+      <!-- game moves container -->
+      <div id="game-moves-container">
+        <div class="game-info">
+          white
+        </div>
+        <!-- moves history -->
+        <table>
+          <thead>
+            <tr>
+              <th>S. no</th>
+              <th>Player 1</th>
+              <th>Player 1</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1.</td>
+              <td>
+                <div>
+                  <div>
+                    <img src="./img/light-pawn.png" alt="light-pawn">
+                  </div>
+                  <span>
+                    d4 to d6
+                  </span>
+                </div>
+              </td>
+              <td>
+                <div>
+                  <div>
+                    <img src="./img/light-pawn.png" alt="light-pawn">
+                  </div>
+                  <span>
+                    d4 to d6
+                  </span>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </main>
 </body>

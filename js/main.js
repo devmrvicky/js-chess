@@ -54,7 +54,7 @@ const initPieceImgInCell = async (cell, piece) => {
     cell.setAttribute("data-piece-id", piece.id);
     cell.setAttribute("data-piece-available", true);
     // create img
-    const img = new Image(40);
+    const img = new Image(45);
     img.src = piece.img;
     img.title = piece.name;
     cell.append(img);
