@@ -103,6 +103,7 @@ const createOneContainerRowOfCells = (
     cell.title = uniqueCellName;
     cell.id = uniqueCellName;
     cell.classList.add("cell");
+    cell.setAttribute("data-piece-available", false);
     // here  if cellWidth and cellHeight are both true means this cell contain any of piece
     if (cellWidth && cellHeight) {
       cell.classList.add("emptyCell");

@@ -5,6 +5,7 @@ if (import.meta.hot) {
 
 import { initPieceImgInCell, gameInfoElem, row, col } from "./main";
 import pieces from "./pieces";
+import { capturePiece } from "./capturePieces";
 
 let moveChance = "white";
 const moves = {
@@ -78,8 +79,10 @@ const changeChances = async () => {
 // pawn
 const pawnNextPos = (piecePos, pieceId, pieceVariant) => {
   let colNo = Number(piecePos[1]);
+  let rowNo = row.indexOf(piecePos[0]);
+
   let totalMovesOfPawn;
-  let nextPos = [];
+  let movePos = [];
   // check if pawn's first move or not
   if (moves[moveChance].pawn[pieceId].length) {
     totalMovesOfPawn = 1;
@@ -92,10 +95,21 @@ const pawnNextPos = (piecePos, pieceId, pieceVariant) => {
     } else {
       colNo--;
     }
-    nextPos.push(`${piecePos[0]}${colNo}`);
+    movePos.push(`${piecePos[0]}${colNo}`);
   }
-  // one condition left that is opponent piece kill condition
-  return nextPos;
+  colNo = Number(piecePos[1]);
+  // capture position
+  // nextPos.push(
+  //   `${row[rowNo - 1]}${colNo + 1}`,
+  //   `${row[rowNo + 1]}${colNo + 1}`
+  // );
+  return {
+    movePos,
+    capturePos: [
+      `${row[rowNo - 1]}${colNo + 1}`,
+      `${row[rowNo + 1]}${colNo + 1}`,
+    ],
+  };
 };
 // rook
 const rookNextPos = (piecePos, moveBlockedCells) => {
@@ -122,7 +136,7 @@ const rookNextPos = (piecePos, moveBlockedCells) => {
       nextPos.push(nextSinglePos);
     }
   }
-  console.log(moveBlockedCells.filter((cell) => cell[0] === piecePos[0]));
+  // console.log(moveBlockedCells.filter((cell) => cell[0] === piecePos[0]));
   // console.log(nextPos.filter((pos) => moveBlockedCells.includes(pos)));
   return nextPos;
 };
@@ -133,7 +147,6 @@ const KnightNextPos = (piecePos) => {
   let nextPos = [];
 
   function colPosOfKnight(dir) {
-    console.log(dir);
     let temp;
     if (dir === "up") {
       temp = Math.abs(colNo - 2);
@@ -242,25 +255,25 @@ const kingNextPos = (piecePos) => {
   return nextPos;
 };
 
-const determineNextStepOfPiece = async (pieceData) => {
+const determineNextStepOfPiece = async (pieceData, moveBlockedCells) => {
   const { pieceName, pieceVariant, piecePos, pieceId } = pieceData.dataset;
+  if (!pieceId) return null;
   console.log(
     `you clicked on ${pieceVariant} ${pieceName} that is on ${piecePos}`
   );
   if (pieceName && pieceVariant !== moveChance) {
-    alert(moveChance + " move");
+    // alert(moveChance + " move");
     return;
   }
-  const moveBlockedCells = Array.from(
-    document.querySelectorAll('[data-piece-available="true"]')
-  )
+  const moveBlockedCellsId = moveBlockedCells
     .map((cellElem) => piecePos !== cellElem.id && cellElem.id)
     .filter((cellId) => cellId);
+
   let nextPos;
   if (pieceName === "pawn") {
     nextPos = pawnNextPos(piecePos, pieceId.split("-")[1], pieceVariant);
   } else if (pieceName === "rook") {
-    nextPos = rookNextPos(piecePos, moveBlockedCells);
+    nextPos = rookNextPos(piecePos, moveBlockedCellsId);
     // console.log(nextPos);
   } else if (pieceName === "knight") {
     nextPos = KnightNextPos(piecePos);
@@ -271,10 +284,12 @@ const determineNextStepOfPiece = async (pieceData) => {
   } else if (pieceName === "king") {
     nextPos = kingNextPos(piecePos);
   }
+  console.log(pieceName + " next poses " + nextPos);
   return nextPos;
 };
 
 const clearPreviousTryMove = (cells) => {
+  // console.log(cells);
   for (let cell of cells) {
     if (cell.classList.contains("nextPos")) {
       cell.classList.remove("nextPos");
@@ -312,49 +327,91 @@ const updateMovesHistory = (movedPieceData) => {
 const move = (cell) => {
   // addEventListen to desire pice cell
   cell.addEventListener("click", async (e) => {
-    const nextPos = await determineNextStepOfPiece(e.currentTarget);
-    if (!nextPos) return;
+    try {
+      // cell.classList.add("selectedCell");
+      const piecesContainCells = Array.from(
+        document.querySelectorAll('[data-piece-available="true"]')
+      );
 
-    // get all empty cell elements
-    const emptyCells = document.querySelectorAll(".emptyCell");
-    // clear previous click
-    clearPreviousTryMove(emptyCells);
-    for (let pos of nextPos) {
-      for (let emptyCell of emptyCells) {
-        if (pos === emptyCell.id) {
-          emptyCell.classList.add("nextPos");
-          emptyCell.addEventListener("click", async () => {
-            try {
-              const pieceId = cell.dataset.pieceId;
-              const pieceInfo = pieces.find((piece) => piece.id === pieceId);
-              // console.log(pieceInfo);
-              const pieceMoved = await initPieceImgInCell(emptyCell, pieceInfo);
-              if (pieceMoved) {
-                clearPreviousTryMove(emptyCells);
-                // update pieces moves history
-                updateMovesHistory(cell.dataset);
-                // reset previous cell
-                await resetPreviousCell(cell);
-                // toggle move chance
-                const chanceChanged = await changeChances();
-                if (chanceChanged) {
-                  // console.log(gameInfoElem);
-                  // gameInfoElem.children[0].remove();
-                  // gameInfoElem.append(document.createTextNode(moveChance));
-                  gameInfoElem.textContent = moveChance;
-                }
-              }
-            } catch (error) {
-              console.log(error.message);
-            }
-          });
+      const nextPos = await determineNextStepOfPiece(
+        e.currentTarget,
+        piecesContainCells
+      );
+      if (!nextPos) return;
+
+      // get all empty cell elements
+      const emptyCells = document.querySelectorAll(".emptyCell");
+      // clear previous click
+      clearPreviousTryMove(emptyCells);
+
+      let possibleMovesOfPice = nextPos;
+      let possibleCaptureMoves = nextPos;
+      if (cell.dataset.pieceName === "pawn") {
+        possibleMovesOfPice = nextPos.movePos;
+        possibleCaptureMoves = nextPos.capturePos;
+      }
+      for (let possibleMove of possibleMovesOfPice) {
+        for (let emptyCell of emptyCells) {
+          if (possibleMove === emptyCell.id) {
+            emptyCell.classList.add("nextPos");
+            emptyCell.addEventListener("click", async () => {
+              // move piece in empty cell
+              await capturePieceOrMove(cell, emptyCell, emptyCells);
+            });
+          }
         }
       }
+
+      // for capture pieces
+      // if (cell.dataset.pieceVariant === moveChance) return;
+      capturePiece(piecesContainCells, cell, possibleCaptureMoves);
+    } catch (error) {
+      console.log(error.message);
     }
   });
 };
 
+// capture piece if there are opposite piece available or move piece
+const capturePieceOrMove = async (
+  cell,
+  targetCell,
+  targetCells,
+  capture = false
+) => {
+  try {
+    const pieceId = cell.dataset.pieceId;
+    const pieceInfo = pieces.find((piece) => piece.id === pieceId);
+    // console.log(pieceInfo);
+    if (targetCell.children[0] && capture) {
+      targetCell.children[0].remove();
+    }
+    const pieceMoved = await initPieceImgInCell(targetCell, pieceInfo);
+    if (pieceMoved) {
+      clearPreviousTryMove(targetCells);
+      // update pieces moves history
+      updateMovesHistory(cell.dataset);
+      // reset previous cell
+      const isResetPrevCell = await resetPreviousCell(cell);
+      // toggle move chance
+      const chanceChanged = await changeChances();
+      if (chanceChanged) {
+        // console.log(gameInfoElem);
+        // gameInfoElem.children[0].remove();
+        // gameInfoElem.append(document.createTextNode(moveChance));
+        gameInfoElem.textContent = moveChance;
+      }
+      return true;
+    } else {
+      return false;
+    }
+  } catch (error) {
+    console.log(error.message);
+    return false;
+  }
+};
+
 export default move;
+export { capturePieceOrMove };
 
 /*
   1. first check white move or dark by default white
