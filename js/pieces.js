@@ -96,16 +96,17 @@ const pieces = [
   { pos: "H2", id: "white-pawn8", name: "pawn", img: lightPawn },
 ];
 
-// const rook = [
-//   { pos: "D1", id: "white-king", name: "king", img: lightKing },
-//   {
-//     pos: "E5",
-//     id: "white-queen",
-//     name: "queen",
-//     img: lightQueen,
-//   },
-//   { pos: "H8", id: "black-rook2", name: "rook", img: darkRook },
-// ];
+const rook = [
+  { pos: "D1", id: "white-queen", name: "queen", img: lightQueen },
+  {
+    pos: "H5",
+    id: "white-rook1",
+    name: "rook",
+    img: lightRook,
+  },
+  { pos: "H8", id: "black-rook2", name: "rook", img: darkRook },
+  { pos: "A8", id: "black-rook1", name: "rook", img: darkRook },
+];
 
 export default pieces;
 // export default rook;

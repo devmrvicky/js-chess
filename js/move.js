@@ -8,6 +8,8 @@ import pieces from "./pieces";
 import { capturePiece } from "./capturePieces";
 import { createMovingHistory } from "./movesHistory";
 
+const playersInfoElem = document.querySelectorAll(".player");
+
 let moveChance = "white";
 const moves = {
   white: {
@@ -88,6 +90,15 @@ const changeChances = async () => {
   try {
     if (moveChance === "white") moveChance = "black";
     else moveChance = "white";
+    for (let playerInfoElem of playersInfoElem) {
+      const { playerVariant, currentMove } = playerInfoElem.dataset;
+      if (currentMove) {
+        playerInfoElem.removeAttribute("data-current-move");
+      }
+      if (playerVariant === moveChance) {
+        playerInfoElem.setAttribute("data-current-move", "true");
+      }
+    }
     console.log(moveChance);
     return true;
   } catch (error) {
@@ -419,13 +430,14 @@ const capturePieceOrMove = async (
         // gameInfoElem.children[0].remove();
         // gameInfoElem.append(document.createTextNode(moveChance));
         gameInfoElem.textContent = moveChance;
-        // update moves history
+        // create piece moving history data object
         const pieceMovingDataObj = new CreatePieceMovingHistoryObj(
           pieceName,
           pieceInfo.img,
           piecePos,
           targetCell.dataset.piecePos
         );
+        // update moves history
         createMovingHistory(pieceMovingDataObj);
       }
       return true;
@@ -439,11 +451,4 @@ const capturePieceOrMove = async (
 };
 
 export default move;
-export { capturePieceOrMove, CreatePieceMovingHistoryObj };
-
-/*
-  1. first check white move or dark by default white
-  2. which piece choose to move 
-      1. if choose pawn and it's first move then give option for two step or if it's diagonal has any opposition then kill that piece and if it's not first move the give one step option to move
-      2. if choose rook, it will move straight way
-*/
+export { capturePieceOrMove, playersInfoElem };
