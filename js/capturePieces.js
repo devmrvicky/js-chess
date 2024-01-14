@@ -31,44 +31,16 @@ class CapturedPiece {
 }
 
 // update capturing pieces
-const updatePieceCaptureHistory = (capturedPieceData, capturedPiecesData) => {
-  if (!capturedPiecesData.length) {
-    const capturePiceDataContainer = [];
-    capturePiceDataContainer.push(capturedPieceData);
-    capturedPiecesData.push(capturePiceDataContainer);
-  } else {
-    // const filteredArray = capturedPiecesData.filter((piecesData) =>
-    //   piecesData.filter(
-    //     (pieceData) => pieceData.pieceName === capturedPieceData.pieceName
-    //   )
-    // );
-    // console.log(filteredArray);
-    for (let individualPieceData of capturedPiecesData) {
-      if (individualPieceData[0].pieceName === capturedPieceData.pieceName) {
-        individualPieceData.push(capturedPieceData);
-      } else {
-        const capturePiceDataContainer = [];
-        capturePiceDataContainer.push(capturedPieceData);
-        capturedPiecesData.push(capturePiceDataContainer);
-      }
-    }
-  }
-};
-
-const updateCapturingPieces = (elem, arr) => {
-  elem.innerHTML = "";
-  for (let e of arr) {
-    const individualPieceElem = document.createElement("div");
-    for (let a of e) {
-      const pieceElem = document.createElement("div");
-      pieceElem.classList.add("pieceImg");
-      const img = document.createElement("img");
-      img.src = a.pieceImg;
-      img.alt = a.pieceName;
-      pieceElem.append(img);
-      individualPieceElem.append(pieceElem);
-    }
-    elem.append(individualPieceElem);
+const updateCapturingPieces = (pieceElem, capturedPieces) => {
+  pieceElem.innerHTML = "";
+  for (let capturedPiece of capturedPieces) {
+    const div = document.createElement("div");
+    div.classList.add("pieceImg");
+    const img = document.createElement("img");
+    img.src = capturedPiece.pieceImg;
+    img.alt = capturedPiece.pieceName;
+    div.append(img);
+    pieceElem.append(div);
   }
 };
 
@@ -108,10 +80,10 @@ const capturePiece = (targetCells, selectedCell, possibleMovesPos) => {
               );
               console.log(pieceVariant);
               if (pieceVariant === "white") {
-                updatePieceCaptureHistory(capturedPieceData, whitePieces);
+                whitePieces.push(capturedPieceData);
                 updateCapturingPieces(whitePieceElem, whitePieces);
               } else if (pieceVariant === "black") {
-                updatePieceCaptureHistory(capturedPieceData, blackPieces);
+                blackPieces.push(capturedPieceData);
                 updateCapturingPieces(blackPieceElem, blackPieces);
                 // do something
               }
