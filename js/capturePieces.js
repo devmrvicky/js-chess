@@ -2,10 +2,10 @@ import { capturePieceOrMove, playersInfoElem } from "./move";
 import pieces from "./pieces";
 
 const whitePieceElem = document.querySelector(
-  "[data-player-variant='white']>.pieces"
+  "[data-player-variant='white'] .pieces"
 );
 const blackPieceElem = document.querySelector(
-  "[data-player-variant='black']>.pieces"
+  "[data-player-variant='black'] .pieces"
 );
 
 const whitePieces = [];
@@ -32,6 +32,7 @@ class CapturedPiece {
 
 // update capturing pieces
 const updateCapturingPieces = (pieceElem, capturedPieces) => {
+  console.log(pieceElem);
   pieceElem.innerHTML = "";
   for (let capturedPiece of capturedPieces) {
     const div = document.createElement("div");
@@ -102,7 +103,7 @@ const capturePiece = (targetCells, selectedCell, possibleMovesPos) => {
   }
 };
 
-export { capturePiece };
+export { capturePiece, whitePieceElem, blackPieceElem };
 
 /*
 <div class="pieces">

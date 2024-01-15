@@ -1,0 +1,72 @@
+@media screen and (max-width: 960px) {
+  aside {
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: white;
+    z-index: 99;
+  }
+
+  aside.collapse {
+    width: 55px;
+
+    .logo h1 {
+      display: none;
+    }
+
+    .menus::before {
+      display: none;
+    }
+
+    .menu p {
+      display: none;
+    }
+
+    .more-opts {
+
+      #signup,
+      #login {
+        display: none;
+      }
+
+      #collapse {
+
+        i {
+          font-size: 1.5rem;
+        }
+
+        span {
+          display: none;
+        }
+      }
+
+      &::before {
+        display: none;
+      }
+    }
+  }
+
+  .game-container {
+    margin-left: 50px !important;
+  }
+}
+
+@media screen and (max-width: 860px) {
+  .game-container {
+    gap: 0 !important;
+  }
+
+  #game-moves-containers {
+    display: none !important;
+  }
+}
+
+@media screen and (max-width: 490px) {
+  aside {
+    display: none !important;
+  }
+
+  .game-container {
+    margin: 0 !important;
+  }
+}

@@ -14,14 +14,52 @@
   <script type="module" src="./js/main.js"></script>
   <!-- css -->
   <link rel="stylesheet" href="./css/style.css">
+  <!-- font awesome cdn -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 </head>
 
 <body>
   <!-- <h1>chess game</h1> -->
   <main>
+    <aside class="collapse">
+      <!-- logo -->
+      <div class="logo">
+        <a href="/" class="flexBox">
+          <img src="./img/logo.png" alt="logo">
+          <h1>chess</h1>
+        </a>
+      </div>
+      <!-- side menus -->
+      <ul class="menus ">
+
+        <li class="menu">
+          <a href="#" class="flexBox">
+            <img src="./img/play.png" alt="play">
+            <p>Play</p>
+          </a>
+        </li>
+        <li class="menu">
+          <a href="#" class="flexBox">
+            <!-- <img src="./img/analytics.png" alt="analytics"> -->
+            <i class="fa-solid fa-chart-simple"></i>
+            <p>analytics</p>
+          </a>
+        </li>
+      </ul>
+      <!-- login -->
+      <div class="more-opts flexBox">
+        <button type="button" class="more-opt" id="signup">Signup</button>
+        <button type="button" class="more-opt" id="login">Login</button>
+        <button type="button" class="more-opt" id="collapse">
+          <i class="fa fa-bars"></i>
+          <span>collapse</span>
+        </button>
+      </div>
+    </aside>
     <div class="game-container">
-      <!-- player info container -->
-      <div id="player-info-container">
+      <!-- chess board container -->
+      <div>
+        <!-- player 1 -->
         <div class="player-1 player" data-current-move="true" data-player-variant="white">
           <div class="player-profile">
             <div class="avatar">
@@ -29,58 +67,77 @@
             </div>
             <div class="player-name">
               <p>Player 1</p>
-              <span>white</span>
+              <div class="pieces">
+                __
+              </div>
             </div>
           </div>
-          <p>Dead pieces</p>
-          <div class="pieces">
-            __
+          <!-- timer -->
+          <div class="timer">
+            10:00
           </div>
         </div>
-        <hr>
-        <div class="player-2 player" data-player-variant="black">
+        <div id="chess-board-container">
+          <div id="chess-board">
+            <img src="./img/chess-board-preview.png" alt="chess-board-preview" class="chess-board-prev-img">
+          </div>
+        </div>
+        <!-- player 2 -->
+        <div class="player-2 player" data-current-move="true" data-player-variant="black">
           <div class="player-profile">
             <div class="avatar">
               <img src="./img/br.png" alt="player2">
             </div>
             <div class="player-name">
-              <p>Player 2</p>
-              <span>black</span>
+              <p>Player 1</p>
+              <div class="pieces">
+                __
+              </div>
             </div>
           </div>
-          <p>Dead pieces</p>
-          <div class="pieces">
-            __
+          <!-- timer -->
+          <div class="timer">
+            10:00
           </div>
         </div>
-      </div>
-      <!-- chess board container -->
-      <div id="chess-board-container">
-        <div class="blank-cell"></div>
-        <div id="chess-board"></div>
+
       </div>
       <!-- game moves container -->
       <div id="game-moves-container">
         <div class="game-info">
           white
         </div>
-        <!-- moves history -->
-        <table>
-          <thead>
-            <tr>
-              <th>S. no</th>
-              <th>Player 1</th>
-              <th>Player 2</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>__</td>
-              <td>__</td>
-              <td>__</td>
-            </tr>
-          </tbody>
-        </table>
+        <!-- new game start -->
+        <div class="new-game">
+          <h2>New game</h2>
+          <div class="set-time">
+            <select name="time" id="select-time">
+              <option value="no-limit">No limit</option>
+              <option value="10">10 min</option>
+              <option value="15">15 min</option>
+              <option value="20">20 min</option>
+              <option value="25">25 min</option>
+              <option value="30">30 min</option>
+              <option value="60">60 min</option>
+            </select>
+          </div>
+          <div class="game-modes">
+            <div class="game-mode choosesGameMode" data-game-mode="head-to-head">
+              Head to Head
+            </div>
+            <div class="game-mode" data-game-mode="vs-computer">
+              Vs. Computer
+            </div>
+            <div class="game-mode" data-game-mode="with-fried">
+              With a friend
+            </div>
+          </div>
+          <button type="button" class="play-btn">
+            play
+          </button>
+          <button type="button">Sign up</button>
+          <p>Already have an account. <a href="#">Login</a></p>
+        </div>
       </div>
     </div>
   </main>

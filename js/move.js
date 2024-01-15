@@ -3,7 +3,7 @@ if (import.meta.hot) {
   import.meta.hot.accept();
 }
 
-import { initPieceImgInCell, gameInfoElem, row, col } from "./main";
+import { initPieceImgInCell, gameInfoElem, row, col } from "./chessBoardInit";
 import pieces from "./pieces";
 import { capturePiece } from "./capturePieces";
 import { createMovingHistory } from "./movesHistory";

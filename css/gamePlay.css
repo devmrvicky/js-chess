@@ -1,0 +1,57 @@
+.new-game {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: relative;
+  padding: 20px;
+}
+
+.set-time::before {
+  font-size: .9rem;
+  color: rgb(90, 90, 90);
+  content: "Set time";
+}
+
+#select-time {
+  width: 100%;
+  padding: 5px;
+}
+
+.game-modes {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  gap: 10px;
+  flex: 1;
+}
+
+.game-modes::before {
+  font-size: .9rem;
+  color: rgb(90, 90, 90);
+  content: "Choose game mode";
+}
+
+.game-mode {
+  border: 1px solid;
+  border-radius: 5px;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.play-btn {
+  margin-top: auto;
+}
+
+.new-game button {
+  padding: 5px;
+}
+
+.new-game>p {
+  font-size: .9rem;
+  text-align: center;
+}
+
+.choosesGameMode {
+  border: 2px solid green;
+}

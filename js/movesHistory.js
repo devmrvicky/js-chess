@@ -1,5 +1,6 @@
-const tableElem = document.querySelector("table");
-const tbodyElem = tableElem.querySelector("tbody");
+// const tableElem = document.querySelector("table");
+import { tableElem } from "./main";
+// const tbodyElem = tableElem.querySelector("tbody");
 
 const movesHistory = [];
 
@@ -31,7 +32,7 @@ const createPieceTd = (pieceHistory) => {
   return fragment;
 };
 
-const updatePiceMovingHistoryDoc = (movesHistory) => {
+const updatePiceMovingHistoryDoc = (movesHistory, tbodyElem) => {
   tbodyElem.innerHTML = "";
   const fragment = document.createDocumentFragment();
   let sNo = 0;
@@ -50,6 +51,7 @@ const updatePiceMovingHistoryDoc = (movesHistory) => {
 };
 
 const createMovingHistory = (pieceMovingData) => {
+  const tbodyElem = tableElem.querySelector("tbody");
   const lastElem = movesHistory[movesHistory.length - 1];
   // console.log(lastElem);
   if (!lastElem || lastElem.length === 2) {
@@ -59,7 +61,7 @@ const createMovingHistory = (pieceMovingData) => {
   } else {
     lastElem.push(pieceMovingData);
   }
-  updatePiceMovingHistoryDoc(movesHistory);
+  updatePiceMovingHistoryDoc(movesHistory, tbodyElem);
 };
 
 export { updatePiceMovingHistoryDoc, createMovingHistory };
