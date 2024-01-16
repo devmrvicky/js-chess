@@ -357,50 +357,62 @@ const updateMovesHistory = (movedPieceData) => {
 
 const move = (cell) => {
   // addEventListen to desire pice cell
-  cell.addEventListener("click", async (e) => {
-    try {
-      // cell.classList.add("selectedCell");
-      const piecesContainCells = Array.from(
-        document.querySelectorAll('[data-piece-available="true"]')
-      );
-
-      const nextPos = await determineNextStepOfPiece(
-        e.currentTarget,
-        piecesContainCells
-      );
-      if (!nextPos) return;
-
-      // get all empty cell elements
-      const emptyCells = document.querySelectorAll(".emptyCell");
-      // clear previous click
-      clearPreviousTryMove(emptyCells);
-
-      let possibleMovesOfPice = nextPos;
-      let possibleCaptureMoves = nextPos;
-      if (cell.dataset.pieceName === "pawn") {
-        possibleMovesOfPice = nextPos.movePos;
-        possibleCaptureMoves = nextPos.capturePos;
-      }
-      for (let possibleMove of possibleMovesOfPice) {
-        for (let emptyCell of emptyCells) {
-          if (possibleMove === emptyCell.id) {
-            emptyCell.classList.add("nextPos");
-            emptyCell.addEventListener("click", async () => {
-              // move piece in empty cell
-              await capturePieceOrMove(cell, emptyCell, emptyCells);
-            });
-          }
-        }
-      }
-
-      // for capture pieces
-      // if (cell.dataset.pieceVariant === moveChance) return;
-      capturePiece(piecesContainCells, cell, possibleCaptureMoves);
-    } catch (error) {
-      console.log(error.message);
-    }
+  cell.addEventListener("click", movePiece);
+  cell.addEventListener("dragstart", movePiece);
+  cell.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    e.currentTarget.style.cursor = "grabbing";
   });
 };
+async function movePiece(e) {
+  try {
+    const cell = e.currentTarget;
+    // cell.classList.add("selectedCell");
+    const piecesContainCells = Array.from(
+      document.querySelectorAll('[data-piece-available="true"]')
+    );
+
+    const nextPos = await determineNextStepOfPiece(
+      e.currentTarget,
+      piecesContainCells
+    );
+    if (!nextPos) return;
+
+    // get all empty cell elements
+    const emptyCells = document.querySelectorAll(".emptyCell");
+    // clear previous click
+    clearPreviousTryMove(emptyCells);
+
+    let possibleMovesOfPice = nextPos;
+    let possibleCaptureMoves = nextPos;
+    if (cell.dataset.pieceName === "pawn") {
+      possibleMovesOfPice = nextPos.movePos;
+      possibleCaptureMoves = nextPos.capturePos;
+    }
+    for (let possibleMove of possibleMovesOfPice) {
+      for (let emptyCell of emptyCells) {
+        if (possibleMove === emptyCell.id) {
+          emptyCell.classList.add("nextPos");
+          emptyCell.addEventListener("click", async () => {
+            // move piece in empty cell
+            await capturePieceOrMove(cell, emptyCell, emptyCells);
+          });
+          cell.addEventListener("dragend", async () => {
+            console.log(emptyCell);
+            // move piece in empty cell
+            await capturePieceOrMove(cell, emptyCell, emptyCells);
+          });
+        }
+      }
+    }
+
+    // for capture pieces
+    // if (cell.dataset.pieceVariant === moveChance) return;
+    capturePiece(piecesContainCells, cell, possibleCaptureMoves);
+  } catch (error) {
+    console.log(error.message);
+  }
+}
 
 // capture piece if there are opposite piece available or move piece
 const capturePieceOrMove = async (

@@ -6,7 +6,8 @@ const playBtnElem = document.querySelector(".play-btn");
 const selectTimeElem = document.querySelector("#select-time");
 const gameModesElem = document.querySelectorAll(".game-mode");
 const chessBoardPrevImgElem = document.querySelector(".chess-board-prev-img");
-const gameMovesContainer = document.querySelector("#game-moves-container");
+const gameMovesContainer = document.querySelector(".game-moves-container");
+const showMovesContainerBtn = document.querySelector(".show-moves-container");
 
 let time = 10;
 let gameMode = "head-to-head";
@@ -102,24 +103,55 @@ const resetGame = () => {
   });
 };
 
-const headToHeadGameInit = (newGameElem) => {
-  chessBoardPrevImgElem.remove();
-  tableElem = getMovesTable();
-  newGameElem.insertAdjacentElement("beforebegin", tableElem);
-  // create abort button
-  abortBtn = document.createElement("button");
-  abortBtn.classList.add("abortBtn");
-  abortBtn.append(document.createTextNode("Abort"));
-  newGameElem.insertAdjacentElement("beforebegin", abortBtn);
-  abortBtn.addEventListener("click", () => {
-    resetGame();
-  });
-  newGameElem.remove();
-  chessBoardInit();
-  console.log(time, gameMode);
+let initGame = false;
+const headToHeadGameInit = async (newGameElem) => {
+  try {
+    if (initGame) return;
+    chessBoardPrevImgElem.remove();
+    tableElem = getMovesTable();
+    newGameElem.insertAdjacentElement("beforebegin", tableElem);
+    // create abort button
+    abortBtn = document.createElement("button");
+    abortBtn.classList.add("abortBtn");
+    abortBtn.append(document.createTextNode("Abort"));
+    newGameElem.insertAdjacentElement("beforebegin", abortBtn);
+    abortBtn.addEventListener("click", () => {
+      resetGame();
+    });
+    newGameElem.remove();
+    chessBoardInit();
+    console.log(time, gameMode);
+    initGame = true;
+    return true;
+  } catch (error) {
+    initGame = false;
+    return false;
+  }
 };
-playBtnElem.addEventListener("click", () => {
-  headToHeadGameInit(newGameElem);
+
+// toggle chess moves container
+const toggleChessMovesContainer = () => {
+  gameMovesContainer.classList.toggle("hide", true);
+  // if (!gameMovesContainer.classList.contains("hide")) {
+  //   gameMovesContainer.classList.add("hide");
+  //   gameMovesContainer.style.transform = "scale(0)";
+  //   gameMovesContainer.style.transformOrigin = "top right";
+  //   gameMovesContainer.style.transition = "all .5s ease-in";
+  // } else {
+  //   gameMovesContainer.classList.remove("hide");
+  //   gameMovesContainer.style.transform = "scale(1)";
+  // }
+};
+showMovesContainerBtn.addEventListener("click", toggleChessMovesContainer);
+
+playBtnElem.addEventListener("click", async () => {
+  try {
+    await headToHeadGameInit(newGameElem);
+    toggleChessMovesContainer();
+    initGame = true;
+  } catch (error) {
+    console.log(error.message);
+  }
 });
 
 export { tableElem, abortBtn };

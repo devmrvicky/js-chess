@@ -29,6 +29,15 @@ main {
   padding: 0 20px;
   justify-content: center;
   gap: 50px;
+  position: relative
+}
+
+.show-moves-container {
+  display: none;
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  padding: 5px 10px
 }
 
 #chess-board-container {
@@ -179,7 +188,12 @@ main {
   border: 1px solid #ff0000;
 }
 
-#game-moves-container {
+.cell[data-piece-available="true"] {
+  -webkit-user-drag: element;
+  cursor: grab;
+}
+
+.game-moves-container {
   max-width: 350px;
   border-radius: 10px;
   padding: 10px;

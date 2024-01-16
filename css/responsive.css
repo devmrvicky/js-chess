@@ -52,12 +52,33 @@
 }
 
 @media screen and (max-width: 860px) {
-  .game-container {
-    gap: 0 !important;
+
+  /* .show-moves-container {
+    display: block !important;
+  } */
+  body {
+    height: auto !important;
   }
 
-  #game-moves-containers {
-    display: none !important;
+  .game-container {
+    gap: 0 !important;
+    flex-direction: column;
+    overflow: auto;
+  }
+
+  #chess-board-container {
+    margin: auto !important;
+    max-width: 500px !important;
+  }
+
+  .game-moves-container {
+    margin: auto !important;
+  }
+}
+
+@media screen and (max-width: 550px) {
+  .game-moves-container {
+    margin: 0;
   }
 }
 
